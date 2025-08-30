@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Criar Ícones PWA</title>
+</head>
+<body style="font-family: Arial; padding: 20px;">
+    <h2>🎨 Gerador de Ícones - Nail Collection</h2>
+    <p>Clique com botão direito → "Salvar imagem como..."</p>
+    
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div>
+            <h3>icon-192.png</h3>
+            <canvas id="icon192" width="192" height="192"></canvas>
+        </div>
+        <div>
+            <h3>icon-512.png</h3>
+            <canvas id="icon512" width="512" height="512"></canvas>
+        </div>
+    </div>
+
+    <script>
+        function createIcon(canvasId, size) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Fundo gradiente
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Círculo branco de fundo
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size*0.35, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Emoji de esmalte
+            ctx.font = `${size * 0.4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('💅', size/2, size/2);
+        }
+        
+        createIcon('icon192', 192);
+        createIcon('icon512', 512);
+    </script>
+</body>
+</html>

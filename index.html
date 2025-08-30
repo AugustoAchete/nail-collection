@@ -823,6 +823,8 @@
                         <option value="holografico">Holográfico</option>
                         <option value="jelly">Jelly</option>
                         <option value="termico">Térmico</option>
+                        <option value="natural">Natural</option>
+                        <option value="transparente">Transparente</option>
                     </select>
                 </div>
 
@@ -909,6 +911,51 @@
                 #FF69B4
             </div>
             
+            <!-- Cores Favoritas -->
+            <div class="preset-colors" id="favoriteColorsSection" style="display: none;">
+                <div class="preset-colors-label" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>💖 Cores Favoritas</span>
+                    <button type="button" onclick="clearFavoriteColors()" style="background: none; border: none; color: #666; font-size: 12px; cursor: pointer;">Limpar</button>
+                </div>
+                <div class="preset-colors-grid" id="favoriteColors">
+                    <!-- Cores favoritas -->
+                </div>
+            </div>
+            
+            <!-- Cores Recentes -->
+            <div class="preset-colors" id="recentColorsSection" style="display: none;">
+                <div class="preset-colors-label" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>🕒 Cores Recentes</span>
+                    <button type="button" onclick="clearRecentColors()" style="background: none; border: none; color: #666; font-size: 12px; cursor: pointer;">Limpar</button>
+                </div>
+                <div class="preset-colors-grid" id="recentColors">
+                    <!-- Cores recentes -->
+                </div>
+            </div>
+            
+            <!-- Paletas Temáticas -->
+            <div class="preset-colors">
+                <div class="preset-colors-label" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>🎨 Paletas Temáticas</span>
+                    <select id="themeSelector" onchange="loadThemePalette()" style="background: white; border: 1px solid #e0e0e0; border-radius: 5px; padding: 5px; font-size: 12px;">
+                        <option value="">Escolha um tema</option>
+                        <option value="verao">🌞 Verão</option>
+                        <option value="inverno">❄️ Inverno</option>
+                        <option value="primavera">🌸 Primavera</option>
+                        <option value="outono">🍂 Outono</option>
+                        <option value="neon">⚡ Neon</option>
+                        <option value="pastel">🌈 Pastel</option>
+                        <option value="metalico">✨ Metálico</option>
+                        <option value="nude">🤍 Nude</option>
+                        <option value="gotico">🔮 Gótico</option>
+                        <option value="vintage">💄 Vintage</option>
+                    </select>
+                </div>
+                <div class="preset-colors-grid" id="themePalette" style="display: none;">
+                    <!-- Paleta temática -->
+                </div>
+            </div>
+            
             <div class="preset-colors">
                 <div class="preset-colors-label">Cores Populares para Esmaltes</div>
                 <div class="preset-colors-grid" id="presetColors">
@@ -949,6 +996,18 @@
                 </div>
             </div>
             
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                <button type="button" onclick="addToFavorites()" style="flex: 1; padding: 8px; background: #ff69b4; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                    💖 Favoritar
+                </button>
+                <button type="button" onclick="generatePalette()" style="flex: 1; padding: 8px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                    🎨 Paleta
+                </button>
+                <button type="button" onclick="suggestCombinations()" style="flex: 1; padding: 8px; background: #4ECDC4; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                    ✨ Sugestões
+                </button>
+            </div>
+            
             <button class="confirm-color-btn" onclick="confirmColor()">Confirmar Cor</button>
         </div>
     </div>
@@ -966,6 +1025,182 @@
         let currentPolishId = null;
         let deferredPrompt;
         let selectedColor = '#ff69b4';
+        let favoriteColors = JSON.parse(localStorage.getItem('favoriteColors') || '[]');
+        let recentColors = JSON.parse(localStorage.getItem('recentColors') || '[]');
+        
+        // Paletas temáticas
+        const themePalettes = {
+            verao: {
+                name: 'Verão',
+                colors: [
+                    { hex: '#FF6B35', name: 'Coral Vibrante' },
+                    { hex: '#F7931E', name: 'Laranja Solar' },
+                    { hex: '#FFD23F', name: 'Amarelo Tropical' },
+                    { hex: '#06FFA5', name: 'Verde Água' },
+                    { hex: '#4ECDC4', name: 'Turquesa' },
+                    { hex: '#45B7D1', name: 'Azul Piscina' },
+                    { hex: '#96CEB4', name: 'Menta' },
+                    { hex: '#FECA57', name: 'Manga' },
+                    { hex: '#FF9FF3', name: 'Rosa Tropical' },
+                    { hex: '#54A0FF', name: 'Céu de Verão' },
+                    { hex: '#5F27CD', name: 'Roxo Vibrante' },
+                    { hex: '#00D2D3', name: 'Azul Caribe' }
+                ]
+            },
+            inverno: {
+                name: 'Inverno',
+                colors: [
+                    { hex: '#2C3E50', name: 'Azul Meia-Noite' },
+                    { hex: '#34495E', name: 'Cinza Tempestade' },
+                    { hex: '#8E44AD', name: 'Roxo Imperial' },
+                    { hex: '#2980B9', name: 'Azul Profundo' },
+                    { hex: '#16A085', name: 'Verde Esmeralda' },
+                    { hex: '#D35400', name: 'Laranja Queimado' },
+                    { hex: '#C0392B', name: 'Vermelho Borgonha' },
+                    { hex: '#7F8C8D', name: 'Prata Fosco' },
+                    { hex: '#1ABC9C', name: 'Verde Água Escuro' },
+                    { hex: '#9B59B6', name: 'Ametista' },
+                    { hex: '#E74C3C', name: 'Vermelho Invernal' },
+                    { hex: '#3498DB', name: 'Azul Gelo' }
+                ]
+            },
+            primavera: {
+                name: 'Primavera', 
+                colors: [
+                    { hex: '#FFB3BA', name: 'Rosa Cerejeira' },
+                    { hex: '#FFDFBA', name: 'Pêssego Suave' },
+                    { hex: '#FFFFBA', name: 'Amarelo Claro' },
+                    { hex: '#BAFFC9', name: 'Verde Novo' },
+                    { hex: '#BAE1FF', name: 'Azul Bebê' },
+                    { hex: '#FFE5CC', name: 'Coral Claro' },
+                    { hex: '#D4A5A5', name: 'Rosa Antigo' },
+                    { hex: '#A8E6CF', name: 'Verde Menta' },
+                    { hex: '#C7CEEA', name: 'Lilás Claro' },
+                    { hex: '#FFC3A0', name: 'Salmão' },
+                    { hex: '#FF677D', name: 'Rosa Vibrante' },
+                    { hex: '#D6A2E8', name: 'Lavênda' }
+                ]
+            },
+            outono: {
+                name: 'Outono',
+                colors: [
+                    { hex: '#D2691E', name: 'Canela' },
+                    { hex: '#CD853F', name: 'Dourado Outonal' },
+                    { hex: '#A0522D', name: 'Marrom Terra' },
+                    { hex: '#8B4513', name: 'Castanho' },
+                    { hex: '#B22222', name: 'Vermelho Folha' },
+                    { hex: '#DAA520', name: 'Dourado' },
+                    { hex: '#FF8C00', name: 'Laranja Queimado' },
+                    { hex: '#DC143C', name: 'Vermelho Carmesím' },
+                    { hex: '#696969', name: 'Cinza Chumbo' },
+                    { hex: '#800000', name: 'Vinho Tinto' },
+                    { hex: '#556B2F', name: 'Verde Oliva' },
+                    { hex: '#8FBC8F', name: 'Verde Musgo' }
+                ]
+            },
+            neon: {
+                name: 'Neon',
+                colors: [
+                    { hex: '#FF0080', name: 'Pink Neon' },
+                    { hex: '#00FF80', name: 'Verde Neon' },
+                    { hex: '#8000FF', name: 'Roxo Neon' },
+                    { hex: '#FF8000', name: 'Laranja Neon' },
+                    { hex: '#0080FF', name: 'Azul Neon' },
+                    { hex: '#FFFF00', name: 'Amarelo Neon' },
+                    { hex: '#FF0040', name: 'Rosa Choque' },
+                    { hex: '#40FF00', name: 'Verde Lima' },
+                    { hex: '#4000FF', name: 'Azul Elétrico' },
+                    { hex: '#FF4000', name: 'Vermelho Neon' },
+                    { hex: '#00FFFF', name: 'Ciano Neon' },
+                    { hex: '#FF00FF', name: 'Magenta Neon' }
+                ]
+            },
+            pastel: {
+                name: 'Pastel',
+                colors: [
+                    { hex: '#FFD6E8', name: 'Rosa Pastel' },
+                    { hex: '#E8D5FF', name: 'Lilás Pastel' },
+                    { hex: '#D5E8FF', name: 'Azul Pastel' },
+                    { hex: '#D5FFE8', name: 'Verde Pastel' },
+                    { hex: '#FFE8D5', name: 'Pêssego Pastel' },
+                    { hex: '#FFFFD5', name: 'Amarelo Pastel' },
+                    { hex: '#F0E8FF', name: 'Lavênda Pastel' },
+                    { hex: '#E8FFD5', name: 'Menta Pastel' },
+                    { hex: '#FFE8F0', name: 'Rosa Bebê' },
+                    { hex: '#D5F0FF', name: 'Azul Bebê' },
+                    { hex: '#F0D5FF', name: 'Roxo Bebê' },
+                    { hex: '#FFF0D5', name: 'Creme Pastel' }
+                ]
+            },
+            metalico: {
+                name: 'Metálico',
+                colors: [
+                    { hex: '#C0C0C0', name: 'Prata' },
+                    { hex: '#FFD700', name: 'Dourado' },
+                    { hex: '#B87333', name: 'Bronze' },
+                    { hex: '#CD7F32', name: 'Cobre' },
+                    { hex: '#E5E4E2', name: 'Platina' },
+                    { hex: '#918151', name: 'Ouro Velho' },
+                    { hex: '#36454F', name: 'Grafite' },
+                    { hex: '#4A4A4A', name: 'Antracite' },
+                    { hex: '#B2BEB5', name: 'Prata Fosca' },
+                    { hex: '#FFEAA7', name: 'Champagne' },
+                    { hex: '#6C5B7B', name: 'Roxo Metálico' },
+                    { hex: '#2E8B57', name: 'Verde Metálico' }
+                ]
+            },
+            nude: {
+                name: 'Nude',
+                colors: [
+                    { hex: '#F5DEB3', name: 'Nude Claro' },
+                    { hex: '#DEB887', name: 'Bege Rosado' },
+                    { hex: '#D2B48C', name: 'Areia' },
+                    { hex: '#BC9A6A', name: 'Caramelo' },
+                    { hex: '#A0826D', name: 'Nude Escuro' },
+                    { hex: '#F4E4BC', name: 'Vanilla' },
+                    { hex: '#E6D3A3', name: 'Champagne Nude' },
+                    { hex: '#C7B377', name: 'Dourado Nude' },
+                    { hex: '#B8860B', name: 'Ouro Nude' },
+                    { hex: '#DAA520', name: 'Mel' },
+                    { hex: '#F0E68C', name: 'Nude Amarelado' },
+                    { hex: '#E5B887', name: 'Nude Rosado' }
+                ]
+            },
+            gotico: {
+                name: 'Gótico',
+                colors: [
+                    { hex: '#000000', name: 'Preto Total' },
+                    { hex: '#8B0000', name: 'Vermelho Sangue' },
+                    { hex: '#800080', name: 'Roxo Profundo' },
+                    { hex: '#2F4F4F', name: 'Cinza Escuro' },
+                    { hex: '#4B0082', name: 'Índigo' },
+                    { hex: '#800000', name: 'Marrom Escuro' },
+                    { hex: '#483D8B', name: 'Azul Escuro' },
+                    { hex: '#2E8B57', name: 'Verde Escuro' },
+                    { hex: '#8B008B', name: 'Magenta Escuro' },
+                    { hex: '#556B2F', name: 'Verde Oliva' },
+                    { hex: '#708090', name: 'Cinza Metálico' },
+                    { hex: '#654321', name: 'Marrom Terra' }
+                ]
+            },
+            vintage: {
+                name: 'Vintage',
+                colors: [
+                    { hex: '#B22222', name: 'Vermelho Vintage' },
+                    { hex: '#8B4513', name: 'Marrom Vintage' },
+                    { hex: '#2F4F4F', name: 'Verde Vintage' },
+                    { hex: '#4682B4', name: 'Azul Vintage' },
+                    { hex: '#D2691E', name: 'Laranja Vintage' },
+                    { hex: '#9932CC', name: 'Roxo Vintage' },
+                    { hex: '#CD853F', name: 'Dourado Vintage' },
+                    { hex: '#A0522D', name: 'Siena Vintage' },
+                    { hex: '#708090', name: 'Cinza Vintage' },
+                    { hex: '#8FBC8F', name: 'Verde Vintage' },
+                    { hex: '#DA70D6', name: 'Rosa Vintage' },
+                    { hex: '#F0E68C', name: 'Creme Vintage' }
+                ]
+            }
+        };
 
         // Cores populares para esmaltes
         const popularColors = [
@@ -1003,6 +1238,9 @@
 
         // Inicializar seletor de cores
         function initColorPicker() {
+            loadFavoriteColors();
+            loadRecentColors();
+            
             const container = document.getElementById('presetColors');
             container.innerHTML = popularColors.map(color => `
                 <div class="preset-color" 
@@ -1044,6 +1282,9 @@
             document.getElementById('colorName').value = name;
             updateColorDisplay(hex);
             
+            // Adicionar à lista de cores recentes
+            addToRecentColors(hex, name);
+            
             // Marcar como selecionada
             document.querySelectorAll('.preset-color').forEach(el => {
                 el.classList.remove('selected');
@@ -1075,6 +1316,9 @@
             selectedColor = hex;
             updateColorDisplay(hex);
             updateSliderGradients();
+            
+            // Limpar nome da cor quando personalizada
+            document.getElementById('colorName').value = '';
         }
 
         // Atualizar gradientes dos sliders
@@ -1129,6 +1373,11 @@
         function confirmColor() {
             document.getElementById('colorPicker').value = selectedColor;
             document.getElementById('colorPreview').style.background = selectedColor;
+            
+            // Adicionar à lista de cores recentes
+            const colorName = document.getElementById('colorName').value || getColorName(selectedColor);
+            addToRecentColors(selectedColor, colorName);
+            
             closeColorPicker();
         }
 
@@ -1204,6 +1453,169 @@
             };
             
             return '#' + toHex(r) + toHex(g) + toHex(b);
+        }
+        
+        // Funções para cores favoritas e recentes
+        function loadFavoriteColors() {
+            const container = document.getElementById('favoriteColors');
+            const section = document.getElementById('favoriteColorsSection');
+            
+            if (favoriteColors.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            container.innerHTML = favoriteColors.map(color => `
+                <div class="preset-color" 
+                     style="background: ${color.hex}; ${color.hex === '#FFFFFF' ? 'border: 2px solid #e0e0e0;' : ''}" 
+                     onclick="selectPresetColor('${color.hex}', '${color.name}')"
+                     title="${color.name}">
+                </div>
+            `).join('');
+        }
+        
+        function loadRecentColors() {
+            const container = document.getElementById('recentColors');
+            const section = document.getElementById('recentColorsSection');
+            
+            if (recentColors.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            container.innerHTML = recentColors.map(color => `
+                <div class="preset-color" 
+                     style="background: ${color.hex}; ${color.hex === '#FFFFFF' ? 'border: 2px solid #e0e0e0;' : ''}" 
+                     onclick="selectPresetColor('${color.hex}', '${color.name}')"
+                     title="${color.name}">
+                </div>
+            `).join('');
+        }
+        
+        function addToRecentColors(hex, name) {
+            // Remover cor se já existe
+            recentColors = recentColors.filter(color => color.hex.toLowerCase() !== hex.toLowerCase());
+            
+            // Adicionar no início
+            recentColors.unshift({ hex, name });
+            
+            // Limitar a 12 cores recentes
+            recentColors = recentColors.slice(0, 12);
+            
+            localStorage.setItem('recentColors', JSON.stringify(recentColors));
+            loadRecentColors();
+        }
+        
+        function addToFavorites() {
+            const colorName = document.getElementById('colorName').value || getColorName(selectedColor);
+            
+            // Verificar se já é favorita
+            if (favoriteColors.some(color => color.hex.toLowerCase() === selectedColor.toLowerCase())) {
+                showNotification('Cor já é favorita! 💖');
+                return;
+            }
+            
+            favoriteColors.push({ hex: selectedColor, name: colorName });
+            localStorage.setItem('favoriteColors', JSON.stringify(favoriteColors));
+            loadFavoriteColors();
+            showNotification('Cor adicionada aos favoritos! 💖');
+        }
+        
+        function clearFavoriteColors() {
+            if (confirm('Limpar todas as cores favoritas?')) {
+                favoriteColors = [];
+                localStorage.setItem('favoriteColors', JSON.stringify(favoriteColors));
+                loadFavoriteColors();
+                showNotification('Cores favoritas limpas');
+            }
+        }
+        
+        function clearRecentColors() {
+            if (confirm('Limpar todas as cores recentes?')) {
+                recentColors = [];
+                localStorage.setItem('recentColors', JSON.stringify(recentColors));
+                loadRecentColors();
+                showNotification('Cores recentes limpas');
+            }
+        }
+        
+        function getColorName(hex) {
+            const color = popularColors.find(c => c.hex.toLowerCase() === hex.toLowerCase());
+            return color ? color.name : hex;
+        }
+        
+        // Gerar paleta de cores harmoniosas
+        function generatePalette() {
+            const hsl = hexToHSL(selectedColor);
+            const palette = [];
+            
+            // Cores complementares e análogas
+            const variations = [
+                { h: hsl.h, s: Math.max(hsl.s - 20, 0), l: Math.min(hsl.l + 20, 100), name: 'Mais Clara' },
+                { h: hsl.h, s: Math.min(hsl.s + 20, 100), l: Math.max(hsl.l - 20, 0), name: 'Mais Escura' },
+                { h: (hsl.h + 30) % 360, s: hsl.s, l: hsl.l, name: 'Análoga +30°' },
+                { h: (hsl.h - 30 + 360) % 360, s: hsl.s, l: hsl.l, name: 'Análoga -30°' },
+                { h: (hsl.h + 180) % 360, s: hsl.s, l: hsl.l, name: 'Complementar' },
+                { h: (hsl.h + 150) % 360, s: hsl.s, l: hsl.l, name: 'Triádica 1' },
+                { h: (hsl.h + 210) % 360, s: hsl.s, l: hsl.l, name: 'Triádica 2' }
+            ];
+            
+            // Mostrar paleta
+            const paletteHtml = `
+                <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                    <div style="font-weight: 600; margin-bottom: 10px; color: #333;">🎨 Paleta Harmoniosa</div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                        ${variations.map(color => {
+                            const hex = hslToHex(color.h, color.s, color.l);
+                            return `
+                                <div style="text-align: center;">
+                                    <div class="preset-color" 
+                                         style="background: ${hex}; width: 100%; height: 40px; margin-bottom: 5px;" 
+                                         onclick="selectPresetColor('${hex}', '${color.name}')"
+                                         title="${color.name}">
+                                    </div>
+                                    <div style="font-size: 10px; color: #666;">${color.name}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // Inserir após a seção de cores personalizadas
+            const customSection = document.querySelector('.custom-color-section');
+            const existingPalette = document.getElementById('generatedPalette');
+            if (existingPalette) {
+                existingPalette.remove();
+            }
+            
+            const paletteDiv = document.createElement('div');
+            paletteDiv.id = 'generatedPalette';
+            paletteDiv.innerHTML = paletteHtml;
+            customSection.parentNode.insertBefore(paletteDiv, customSection.nextSibling);
+        }
+        
+        // Carregar paleta temática
+        function loadThemePalette() {
+            const theme = document.getElementById('themeSelector').value;
+            const container = document.getElementById('themePalette');
+            
+            if (!theme || !themePalettes[theme]) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            const palette = themePalettes[theme];
+            container.style.display = 'grid';
+            container.innerHTML = palette.colors.map(color => `
+                <div class="preset-color" 
+                     style="background: ${color.hex}; ${color.hex === '#FFFFFF' ? 'border: 2px solid #e0e0e0;' : ''}" 
+                     onclick="selectPresetColor('${color.hex}', '${color.name}')"
+                     title="${color.name}">
+                </div>
+            `).join('');
         }
 
         // Registrar Service Worker (apenas em produção)
@@ -1676,6 +2088,191 @@
             }
         `;
         document.head.appendChild(style);
+        
+        // Converter RGB para Hex
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => {
+                const hex = x.toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+        
+        // Sugerir combinações de cores
+        function suggestCombinations() {
+            const hsl = hexToHSL(selectedColor);
+            
+            // Diferentes tipos de combinações
+            const combinations = {
+                monocromatica: {
+                    name: 'Monocromática',
+                    description: 'Variações da mesma cor',
+                    colors: [
+                        { h: hsl.h, s: Math.max(hsl.s - 30, 0), l: Math.min(hsl.l + 30, 100), name: 'Mais Clara' },
+                        { h: hsl.h, s: hsl.s, l: hsl.l, name: 'Cor Base' },
+                        { h: hsl.h, s: Math.min(hsl.s + 20, 100), l: Math.max(hsl.l - 20, 0), name: 'Mais Intensa' },
+                        { h: hsl.h, s: Math.min(hsl.s + 30, 100), l: Math.max(hsl.l - 30, 0), name: 'Mais Escura' }
+                    ]
+                },
+                complementar: {
+                    name: 'Complementar',
+                    description: 'Cores opostas no círculo cromático',
+                    colors: [
+                        { h: hsl.h, s: hsl.s, l: hsl.l, name: 'Cor Base' },
+                        { h: (hsl.h + 180) % 360, s: hsl.s, l: hsl.l, name: 'Complementar' },
+                        { h: hsl.h, s: Math.max(hsl.s - 20, 0), l: Math.min(hsl.l + 20, 100), name: 'Base Clara' },
+                        { h: (hsl.h + 180) % 360, s: Math.max(hsl.s - 20, 0), l: Math.min(hsl.l + 20, 100), name: 'Complementar Clara' }
+                    ]
+                },
+                triadica: {
+                    name: 'Triádica',
+                    description: 'Três cores equilibradas',
+                    colors: [
+                        { h: hsl.h, s: hsl.s, l: hsl.l, name: 'Cor Base' },
+                        { h: (hsl.h + 120) % 360, s: hsl.s, l: hsl.l, name: 'Triádica 1' },
+                        { h: (hsl.h + 240) % 360, s: hsl.s, l: hsl.l, name: 'Triádica 2' },
+                        { h: hsl.h, s: Math.max(hsl.s - 30, 0), l: Math.min(hsl.l + 30, 100), name: 'Neutra' }
+                    ]
+                },
+                analoga: {
+                    name: 'Análoga',
+                    description: 'Cores vizinhas harmoniosas',
+                    colors: [
+                        { h: (hsl.h - 30 + 360) % 360, s: hsl.s, l: hsl.l, name: 'Análoga -30°' },
+                        { h: hsl.h, s: hsl.s, l: hsl.l, name: 'Cor Base' },
+                        { h: (hsl.h + 30) % 360, s: hsl.s, l: hsl.l, name: 'Análoga +30°' },
+                        { h: (hsl.h + 60) % 360, s: hsl.s, l: hsl.l, name: 'Análoga +60°' }
+                    ]
+                },
+                splitComplementar: {
+                    name: 'Split-Complementar',
+                    description: 'Combinação sofisticada',
+                    colors: [
+                        { h: hsl.h, s: hsl.s, l: hsl.l, name: 'Cor Base' },
+                        { h: (hsl.h + 150) % 360, s: hsl.s, l: hsl.l, name: 'Split 1' },
+                        { h: (hsl.h + 210) % 360, s: hsl.s, l: hsl.l, name: 'Split 2' },
+                        { h: hsl.h, s: Math.max(hsl.s - 40, 0), l: Math.min(hsl.l + 40, 100), name: 'Neutra' }
+                    ]
+                }
+            };
+            
+            // Gerar HTML das sugestões
+            const suggestionsHtml = `
+                <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                    <div style="font-weight: 600; margin-bottom: 15px; color: #333;">✨ Sugestões de Combinações</div>
+                    ${Object.entries(combinations).map(([key, combo]) => `
+                        <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 8px; border-left: 4px solid #667eea;">
+                            <div style="font-weight: 500; color: #333; margin-bottom: 5px;">${combo.name}</div>
+                            <div style="font-size: 12px; color: #666; margin-bottom: 10px;">${combo.description}</div>
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                                ${combo.colors.map(color => {
+                                    const hex = hslToHex(color.h, color.s, color.l);
+                                    return `
+                                        <div style="text-align: center;">
+                                            <div class="preset-color" 
+                                                 style="background: ${hex}; width: 100%; height: 35px; margin-bottom: 5px; border-radius: 6px;" 
+                                                 onclick="selectPresetColor('${hex}', '${color.name}')"
+                                                 title="${color.name}">
+                                            </div>
+                                            <div style="font-size: 10px; color: #666;">${color.name}</div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button onclick="generateNailArtIdeas()" style="padding: 8px 15px; background: #ff69b4; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                            💅 Ideias de Nail Art
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Inserir sugestões
+            const customSection = document.querySelector('.custom-color-section');
+            const existingSuggestions = document.getElementById('colorSuggestions');
+            if (existingSuggestions) {
+                existingSuggestions.remove();
+            }
+            
+            const suggestionsDiv = document.createElement('div');
+            suggestionsDiv.id = 'colorSuggestions';
+            suggestionsDiv.innerHTML = suggestionsHtml;
+            customSection.parentNode.insertBefore(suggestionsDiv, customSection.nextSibling);
+        }
+        
+        // Gerar ideias de nail art baseadas na cor
+        function generateNailArtIdeas() {
+            const hsl = hexToHSL(selectedColor);
+            const colorName = document.getElementById('colorName').value || getColorName(selectedColor);
+            
+            // Ideias baseadas na cor
+            const ideas = [];
+            
+            // Baseado na tonalidade (hue)
+            if (hsl.h >= 0 && hsl.h < 30 || hsl.h >= 330) { // Vermelho/Rosa
+                ideas.push('🌹 Nail art romântica com rosas', '💖 Corações delicados', '🎄 Tema natalino elegante');
+            } else if (hsl.h >= 30 && hsl.h < 60) { // Laranja
+                ideas.push('🍂 Folhas de outono', '🎃 Halloween criativo', '☀️ Por do sol');
+            } else if (hsl.h >= 60 && hsl.h < 90) { // Amarelo
+                ideas.push('🌻 Girassóis', '✨ Brilho dourado', '🌞 Verão tropical');
+            } else if (hsl.h >= 90 && hsl.h < 150) { // Verde
+                ideas.push('🌿 Folhagem', '🐸 Tema natural', '🍀 Trevo da sorte');
+            } else if (hsl.h >= 150 && hsl.h < 210) { // Azul/Ciano
+                ideas.push('🌊 Ondas do mar', '❄️ Cristais de gelo', '🦋 Borboletas');
+            } else if (hsl.h >= 210 && hsl.h < 270) { // Azul
+                ideas.push('🌌 Via láctea', '💫 Estrelas', '🎙️ Noite urbana');
+            } else { // Roxo/Violeta
+                ideas.push('🔮 Místico', '🌸 Flores delicadas', '🦄 Unicórnio');
+            }
+            
+            // Baseado na saturação
+            if (hsl.s < 30) {
+                ideas.push('🤍 Nude sofisticado', '✨ Minimalista chic', '🐄 Geométrico suave');
+            } else if (hsl.s > 70) {
+                ideas.push('⚡ Neon vibrante', '🎈 Festival de cores', '💥 Pop art');
+            }
+            
+            // Baseado na luminosidade
+            if (hsl.l < 30) {
+                ideas.push('🌙 Noturno elegante', '🕷️ Gótico moderno', '⬛ Dramatic black');
+            } else if (hsl.l > 80) {
+                ideas.push('☁️ Nuvens delicadas', '🌼 Primavera suave', '🥰 Baby colors');
+            }
+            
+            // Selecionar 6 ideias aleatórias
+            const selectedIdeas = ideas.sort(() => 0.5 - Math.random()).slice(0, 6);
+            
+            const ideasHtml = `
+                <div style="margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #ff69b4 0%, #667eea 100%); border-radius: 10px; color: white;">
+                    <div style="font-weight: 600; margin-bottom: 10px; text-align: center;">💅 Ideias de Nail Art com ${colorName}</div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 12px;">
+                        ${selectedIdeas.map(idea => `
+                            <div style="background: rgba(255,255,255,0.2); padding: 8px; border-radius: 6px; backdrop-filter: blur(10px);">
+                                ${idea}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top: 10px; text-align: center; font-size: 11px; opacity: 0.9;">
+                        💡 Clique em "Confirmar Cor" para usar nos seus esmaltes!
+                    </div>
+                </div>
+            `;
+            
+            // Adicionar ideias
+            const suggestionsContainer = document.getElementById('colorSuggestions');
+            if (suggestionsContainer) {
+                const existingIdeas = suggestionsContainer.querySelector('.nail-art-ideas');
+                if (existingIdeas) {
+                    existingIdeas.remove();
+                }
+                
+                const ideasDiv = document.createElement('div');
+                ideasDiv.className = 'nail-art-ideas';
+                ideasDiv.innerHTML = ideasHtml;
+                suggestionsContainer.appendChild(ideasDiv);
+            }
+        }
     </script>
 </body>
 </html>

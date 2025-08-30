@@ -1,6 +1,6 @@
 # 💅 Nail Collection - Gerenciador de Esmaltes
 
-Um aplicativo web progressivo (PWA) para organizar e gerenciar sua coleção de esmaltes de forma prática e visual.
+Um aplicativo web progressivo (PWA) para organizar e gerenciar sua coleção de esmaltes de forma prática e visual, com ferramentas avançadas de seleção e combinação de cores.
 
 ## ✨ Funcionalidades
 
@@ -12,14 +12,35 @@ Um aplicativo web progressivo (PWA) para organizar e gerenciar sua coleção de 
 ### 🎨 Gestão de Coleção
 - **Adicionar esmaltes** com informações detalhadas:
   - Nome e marca
-  - Cor principal com seletor visual
+  - Cor principal com seletor visual avançado
   - Categoria (cremoso, perolado, glitter, metálico, etc.)
   - Data de validade
   - Fotos do esmalte
   - Observações pessoais
 
+### 🌈 Seletor de Cores Avançado
+- **Cores Favoritas**: Salve suas cores preferidas para acesso rápido
+- **Cores Recentes**: Histórico automático das últimas 12 cores utilizadas
+- **Paletas Temáticas**: 10 temas com cores cuidadosamente selecionadas
+  - 🌞 Verão - 🌨️ Inverno - 🌸 Primavera - 🍂 Outono
+  - ⚡ Neon - 🌈 Pastel - ✨ Metálico - 🤍 Nude
+  - 🖤 Gótico - 👑 Vintage
+- **Eye Dropper**: Capture cores de fotos ou use o seletor nativo do navegador
+- **Sliders HSL**: Controle preciso de matiz, saturação e luminosidade
+- **Input hexadecimal**: Inserção manual de códigos de cor
+
+### ✨ Sugestões Inteligentes de Cores
+- **Combinações Harmoniosas**: 5 tipos de harmonias cromáticas
+  - Monocromática (variações da mesma cor)
+  - Complementar (cores opostas)
+  - Triádica (três cores equilibradas)
+  - Análoga (cores vizinhas)
+  - Split-Complementar (combinação sofisticada)
+- **Gerador de Paletas**: Cria paletas automáticas baseadas na cor selecionada
+- **Ideias de Nail Art**: Sugestões personalizadas baseadas na cor escolhida
+
 ### 🔍 Organização e Busca
-- Filtro por cores
+- Filtro por cores com agrupamento inteligente
 - Busca por nome, marca ou cor
 - Visualização em grade com miniaturas
 - Detalhes completos de cada esmalte
@@ -41,7 +62,7 @@ Um aplicativo web progressivo (PWA) para organizar e gerenciar sua coleção de 
 ### Instalação Local
 
 1. Clone ou baixe os arquivos do projeto
-2. Abra o arquivo `index.html.html` em seu navegador
+2. Abra o arquivo `index.html` em seu navegador
 3. Para funcionalidade PWA completa, sirva os arquivos através de um servidor web local
 
 ### Instalação como PWA
@@ -65,13 +86,14 @@ Um aplicativo web progressivo (PWA) para organizar e gerenciar sua coleção de 
 
 ```
 nail-collection/
-├── index.html.html    # Aplicação principal
-├── manifest.json      # Configuração PWA
-├── sw.js             # Service Worker para funcionalidade offline
-├── criar-icones.html # Gerador de ícones PWA
-├── icon-192.png      # Ícone 192x192
-├── icon-512.png      # Ícone 512x512
-└── README.md         # Este arquivo
+├── index.html        # Aplicação principal
+├── manifest.json     # Configuração PWA
+├── sw.js            # Service Worker para funcionalidade offline
+├── icons/           # Diretório de ícones PWA
+│   ├── icon-32x32.png
+│   ├── icon-192x192.png
+│   └── icon-512x512.png
+└── README.md        # Este arquivo
 ```
 
 ## 🛠️ Tecnologias Utilizadas
@@ -87,6 +109,7 @@ nail-collection/
 
 Os dados são salvos localmente no navegador usando LocalStorage:
 - Lista de esmaltes com todas as informações
+- Cores favoritas e recentes do usuário
 - Imagens em formato base64
 - Nail arts associadas a cada esmalte
 - Configurações e preferências
@@ -98,14 +121,19 @@ Os dados são salvos localmente no navegador usando LocalStorage:
 - Design responsivo para todos os tamanhos de tela
 - Modo de visualização em grade
 - Preview de cores em tempo real
+- Seletor de cores avançado com canvas interativo
+- Paletas temáticas com cores organizadas
+- Sugestões visuais de combinações harmoniosas
 
 ## 📱 Compatibilidade
 
-- ✅ Chrome (Android/Desktop)
-- ✅ Safari (iOS/macOS)
-- ✅ Edge (Desktop)
-- ✅ Firefox (Android/Desktop)
-- ✅ Samsung Internet
+- ✅ Chrome (Android/Desktop) - Suporte completo incluindo EyeDropper API
+- ✅ Safari (iOS/macOS) - Funcionalidades completas
+- ✅ Edge (Desktop) - Suporte completo incluindo EyeDropper API
+- ✅ Firefox (Android/Desktop) - Funcionalidades completas
+- ✅ Samsung Internet - Funcionalidades completas
+
+**Nota**: A API EyeDropper nativa está disponível apenas no Chrome e Edge. Outros navegadores usam o upload de imagem para captura de cores.
 
 ## 🔒 Privacidade
 
@@ -118,8 +146,16 @@ Os dados são salvos localmente no navegador usando LocalStorage:
 ### Service Worker
 O Service Worker permite que o app funcione offline, armazenando em cache todos os recursos necessários após a primeira visita.
 
-### Gerador de Ícones
-O arquivo `criar-icones.html` pode ser usado para gerar os ícones PWA necessários. Abra o arquivo no navegador e salve as imagens geradas.
+### Funcionalidades Avançadas de Cor
+- **Canvas API**: Usado para captura de cores de imagens
+- **EyeDropper API**: API nativa do navegador para captura de cores da tela
+- **Algoritmos HSL**: Conversões precisas entre sistemas de cor
+- **Teoria das Cores**: Implementação de harmonias cromáticas clássicas
+
+### Armazenamento Inteligente
+- Cores favoritas e recentes são mantidas separadamente
+- Limite automático de 12 cores recentes para otimização
+- Persistência de paletas personalizadas
 
 ## 🤝 Contribuindo
 
